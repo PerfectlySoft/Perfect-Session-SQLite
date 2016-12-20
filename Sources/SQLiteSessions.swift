@@ -60,7 +60,7 @@ public struct SQLiteSessions {
 			idle: session.idle,
 			data: session.data
 		)
-		_ = try? proxy.save()
+		_ = try? proxy.create()
 		return session
 	}
 
@@ -81,6 +81,7 @@ public struct SQLiteSessions {
 	}
 
 	public func resume(token: String) -> PerfectSession {
+		print("Resume with token: \(token)")
 		var session = PerfectSession()
 		let proxy = PerfectSessionClass()
 		do {
