@@ -23,11 +23,17 @@ class PerfectSessionClass: SQLiteStORM {
 	/// Idle time set at last update
 	var idle			= SessionConfig.idle
 	/// Data held in storage associated with session
-	//	var data			= "{}"
 	var data			= [String: Any]()
 
+	/// IP Address of Session
+	var ipaddress		= ""
+
+	/// UserAgent of Session
+	var useragent		= ""
+
+
 	override open func table() -> String {
-		return SessionConfig.couchDatabase
+		return "sessions"
 	}
 
 	override init(){
@@ -39,7 +45,7 @@ class PerfectSessionClass: SQLiteStORM {
 		if runSetup { try? setup() }
 	}
 
-	init(token: String, userid: String, created: Int, updated: Int, idle: Int, data: [String: Any] ){
+	init(token: String, userid: String, created: Int, updated: Int, idle: Int, data: [String: Any], ipaddress: String, useragent: String ){
 		super.init()
 		self.token = token
 		self.userid = userid
@@ -47,11 +53,8 @@ class PerfectSessionClass: SQLiteStORM {
 		self.updated = updated
 		self.idle = idle
 		self.data = data
-		//		do {
-		//			self.data = try data.jsonEncodedString()
-		//		} catch {
-		//			self.data = "{}"
-		//		}
+		self.ipaddress = ipaddress
+		self.useragent = useragent
 	}
 
 	override open func to(_ this: StORMRow) {
@@ -60,10 +63,11 @@ class PerfectSessionClass: SQLiteStORM {
 		created		= this.data["created"] as? Int ?? 0
 		updated		= this.data["updated"] as? Int ?? 0
 		idle		= this.data["idle"] as? Int ?? 0
-		//		data		= this.data["data"] as? String ?? "{}"
 		if let str = this.data["data"] {
 			data = try! (str as! String).jsonDecode() as! [String : Any]
 		}
+		ipaddress		= this.data["ipaddress"] as? String ?? ""
+		useragent		= this.data["useragent"] as? String ?? ""
 	}
 
 	func rows() -> [PerfectSessionClass] {
