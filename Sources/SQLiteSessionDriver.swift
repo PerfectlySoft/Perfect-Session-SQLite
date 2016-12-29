@@ -66,7 +66,7 @@ extension SessionSQLiteFilter: HTTPResponseFilter {
 
 		if !sessionID.isEmpty {
 			response.addCookie(HTTPCookie(name: SessionConfig.name,
-			                              value: "\(sessionID)",
+				value: "\(sessionID)",
 				domain: domain,
 				expires: .relativeSeconds(SessionConfig.idle),
 				path: SessionConfig.cookiePath,
