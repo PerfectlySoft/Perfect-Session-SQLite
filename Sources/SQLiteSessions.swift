@@ -55,6 +55,8 @@ public struct SQLiteSessions {
 		session.token = rand.secureToken
 		session.ipaddress = request.remoteAddress.host
 		session.useragent = request.header(.userAgent) ?? "unknown"
+		session._state = "new"
+		session.setCSRF()
 
 		// perform INSERT
 		let proxy = PerfectSessionClass(
@@ -109,6 +111,7 @@ public struct SQLiteSessions {
 		} catch {
 			print("Error retrieving session: \(error)")
 		}
+		session._state = "resume"
 		return session
 	}
 

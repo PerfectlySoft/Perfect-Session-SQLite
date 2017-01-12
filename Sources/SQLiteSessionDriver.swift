@@ -8,6 +8,7 @@
 
 import PerfectHTTP
 import PerfectSession
+import PerfectLogger
 
 public struct SessionSQLiteDriver {
 	public var requestFilter: (HTTPRequestFilter, HTTPFilterPriority)
@@ -36,6 +37,7 @@ extension SessionSQLiteFilter: HTTPRequestFilter {
 			let session = driver.resume(token: token)
 			if session.isValid(request) {
 				request.session = session
+				request.session._state = "resume"
 				createSession = false
 			} else {
 				driver.destroy(token: token)
@@ -46,6 +48,26 @@ extension SessionSQLiteFilter: HTTPRequestFilter {
 			request.session = driver.start(request)
 
 		}
+
+		// Now process CSRF
+		if request.session._state != "new" || request.method == .post {
+			//print("Check CSRF Request: \(CSRFFilter.filter(request))")
+			if !CSRFFilter.filter(request) {
+
+				switch SessionConfig.CSRFfailAction {
+				case .fail:
+					response.status = .notAcceptable
+					callback(.halt(request, response))
+					return
+				case .log:
+					LogFile.info("CSRF FAIL")
+
+				default:
+					print("CSRF FAIL (console notification only)")
+				}
+			}
+		}
+		
 
 		callback(HTTPRequestFilterResult.continue(request, response))
 	}
@@ -75,6 +97,13 @@ extension SessionSQLiteFilter: HTTPResponseFilter {
 				sameSite: SessionConfig.cookieSameSite
 				)
 			)
+
+			// CSRF Set Cookie
+			if SessionConfig.CSRFCheckState {
+				//print("in SessionConfig.CSRFCheckState")
+				CSRFFilter.setCookie(response)
+			}
+
 		}
 
 		callback(.continue)
