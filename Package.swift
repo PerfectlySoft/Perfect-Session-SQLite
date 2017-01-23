@@ -5,7 +5,7 @@ let package = Package(
     name: "PerfectSessionSQLite",
     targets: [],
     dependencies: [
-        .Package(url: "https://github.com/PerfectlySoft/Perfect-Session.git", majorVersion: 1),
+        .Package(url: "https://github.com/PerfectlySoft/Perfect-Session.git", majorVersion: 1, minor: 0),
         .Package(url: "https://github.com/SwiftORM/SQLite-StORM.git", majorVersion: 1),
     ]
 )
