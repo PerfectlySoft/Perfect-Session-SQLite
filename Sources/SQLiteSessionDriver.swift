@@ -87,6 +87,12 @@ extension SessionSQLiteFilter: HTTPRequestFilter {
 		}
 		callback(HTTPRequestFilterResult.continue(request, response))
 	}
+
+	/// Wrapper enabling PerfectHTTP 2.1 filter support
+	public static func filterAPIRequest(data: [String:Any]) throws -> HTTPRequestFilter {
+		return SessionSQLiteFilter()
+	}
+
 }
 
 extension SessionSQLiteFilter: HTTPResponseFilter {
@@ -129,6 +135,12 @@ extension SessionSQLiteFilter: HTTPResponseFilter {
 
 		callback(.continue)
 	}
+
+	/// Wrapper enabling PerfectHTTP 2.1 filter support
+	public static func filterAPIResponse(data: [String:Any]) throws -> HTTPResponseFilter {
+		return SessionSQLiteFilter()
+	}
+
 
 	/// Called zero or more times for each bit of body data which is sent to the client.
 	public func filterBody(response: HTTPResponse, callback: (HTTPResponseFilterResult) -> ()) {
