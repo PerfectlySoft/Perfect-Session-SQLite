@@ -6,7 +6,7 @@
 //
 //
 
-import TurnstileCrypto
+import Foundation
 import SQLiteStORM
 import PerfectSession
 import PerfectHTTP
@@ -50,9 +50,8 @@ public struct SQLiteSessions {
 	}
 
 	public func start(_ request: HTTPRequest) -> PerfectSession {
-		let rand = URandom()
 		var session = PerfectSession()
-		session.token = rand.secureToken
+		session.token = UUID().uuidString
 		session.ipaddress = request.remoteAddress.host
 		session.useragent = request.header(.userAgent) ?? "unknown"
 		session._state = "new"
