@@ -17,6 +17,17 @@ public struct SQLiteSessions {
 	/// Initializes the Session Manager. No config needed!
 	public init() {}
 
+	public func clean() {
+		let proxy = PerfectSessionClass()
+		do {
+			try proxy.sql(
+				"DELETE FROM \(proxy.table) WHERE updated + idle < :1",
+				params: ["\(Int(Date().timeIntervalSince1970))"]
+			)
+		} catch {
+			print(error)
+		}
+	}
 
 	public func save(session: PerfectSession) {
 		var s = session
