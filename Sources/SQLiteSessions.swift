@@ -86,17 +86,20 @@ public struct SQLiteSessions {
 	/// Deletes the session for a session identifier.
 	public func destroy(_ request: HTTPRequest, _ response: HTTPResponse) {
 		let proxy = PerfectSessionClass()
-		do {
-			do {
-				try proxy.find(["token":(request.session?.token)!])
-				proxy.to(proxy.results.rows[0])
-			} catch {
-				print("Error retrieving session: \(error)")
-			}
-			try proxy.delete()
-		} catch {
-			print(error)
-		}
+        if let token = request.session?.token {
+            do {
+                do {
+                    try proxy.find(["token":token])
+                    proxy.to(proxy.results.rows[0])
+                } catch {
+                    print("Error retrieving session: \(error)")
+                }
+                try proxy.delete()
+            } catch {
+                print(error)
+            }
+        }
+		
 		// Reset cookie to make absolutely sure it does not get recreated in some circumstances.
 		var domain = ""
 		if !SessionConfig.cookieDomain.isEmpty {
