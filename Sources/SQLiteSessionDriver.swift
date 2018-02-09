@@ -9,25 +9,23 @@
 import PerfectHTTP
 import PerfectSession
 import PerfectLogger
-import PerfectRepeater
+import PerfectLib
+import Dispatch
 
 public struct SessionSQLiteDriver {
 	public var requestFilter: (HTTPRequestFilter, HTTPFilterPriority)
 	public var responseFilter: (HTTPResponseFilter, HTTPFilterPriority)
-
+	let queue: DispatchQueue
 
 	public init() {
 		let filter = SessionSQLiteFilter()
 		requestFilter = (filter, HTTPFilterPriority.high)
 		responseFilter = (filter, HTTPFilterPriority.high)
-
-		let cleaner = {
-			() -> Bool in
+		queue = DispatchQueue(label: UUID().string)
+		queue.asyncAfter(deadline: .now() + Double(SessionConfig.purgeInterval)) {
 			let s = SQLiteSessions()
 			s.clean()
-			return true
 		}
-		Repeater.exec(timer: Double(SessionConfig.purgeInterval), callback: cleaner)
 	}
 }
 public class SessionSQLiteFilter {
@@ -47,10 +45,10 @@ extension SessionSQLiteFilter: HTTPRequestFilter {
 			if let token = request.getCookie(name: SessionConfig.name) {
 				// From Cookie
 				session = driver.resume(token: token)
-			} else if let bearer = request.header(.authorization), !bearer.isEmpty {
+			} else if var bearer = request.header(.authorization), !bearer.isEmpty, bearer.hasPrefix("Bearer ") {
 				// From Bearer Token
-				let b = bearer.chompLeft("Bearer ")
-				session = driver.resume(token: b)
+				bearer.removeFirst("Bearer ".count)
+				session = driver.resume(token: bearer)
 
 			} else if let s = request.param(name: "session"), !s.isEmpty {
 				// From Session Link
