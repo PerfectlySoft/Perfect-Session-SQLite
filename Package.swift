@@ -12,6 +12,6 @@ let package = Package(
 		.package(url: "https://github.com/SwiftORM/SQLite-StORM.git", from: "3.0.0"),
 	],
 	targets: [
-		.target(name: "PerfectSessionSQLite", dependencies: ["SQLiteStORM"])
+		.target(name: "PerfectSessionSQLite", dependencies: ["PerfectSession", "SQLiteStORM"])
 	]
 )
