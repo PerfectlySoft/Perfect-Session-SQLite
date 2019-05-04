@@ -73,7 +73,6 @@ extension SessionSQLiteFilter: HTTPRequestFilter {
 
 			// Now process CSRF
 			if request.session?._state != "new" || request.method == .post {
-				//print("Check CSRF Request: \(CSRFFilter.filter(request))")
 				if !CSRFFilter.filter(request) {
 
 					switch SessionConfig.CSRF.failAction {
